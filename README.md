@@ -6,7 +6,7 @@ stAPAminer first identifies poly(A) sites from spatial RNA-seq and then qantifie
 
 * The stAPAminer package consists of three main modules.
 
-<img src="stAPAminer/pic/process.jpg" width="100%" />
+<img src="pic/process.jpg" width="100%" />
 
 A. Identification and quantification of APA from spatial transcriptomics data, then quantification and imputation of spatial APA usages.
 
