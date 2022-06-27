@@ -1,0 +1,122 @@
+---
+title: "introduction"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{introduction}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(stAPAminer)
+library(movAPA)
+library(org.Mm.eg.db)
+library(Seurat)
+library(ggplot2)
+library(fdm2id)
+library(ClusterR)
+library(cluster)
+library(clusterSim)
+library(SPARK)
+```
+
+# 1. Load the example data
+```{r}
+# movAPA Object
+load(system.file("extdata", "APA.RDA", package = "stAPAminer"))
+# gene expression count
+count<-read.csv(system.file("extdata", "count.csv", package = "stAPAminer"))
+# individual spots and coordinates
+position<-read.table(system.file("extdata", "position.txt", package = "stAPAminer"))
+```
+
+# 2. Calculate APA index and impute
+```{r}
+# Qantifies
+RUD_RAW<-computeAPAIndex(APA,rownames(position)) 
+geneSymbol <-  mapIds(org.Mm.eg.db,rownames(RUD_RAW),'SYMBOL','ENTREZID')
+rownames(RUD_RAW)<-geneSymbol
+
+# Imputes
+RUD <-imputeAPAIndex(RUD_RAW,count,k=10,init = TRUE)
+
+RUD_RAW[is.na(RUD_RAW)]<-0
+
+# Create stAPAminer Object
+stObj<- createStAPAminerObject(RUD,position) # Impute
+
+# Cluster
+# RUD imputed
+stObj <- makeStCluster(stObj,resolution = 0.7, dims = 1:10, k=30,nfeatures = 4500)
+
+# Graphs the spatial scatter plot
+findLabels(stObj)
+
+# Annotation Spatial Layer
+stObj<-RenameCluster(stObj,c("GCL","GL","ONL","OPL","MCL"))
+cb_palette1 <- c("#AEA5D6", "#B8E071", "#A5D9C7","#DA8C6B","#C65DCD")
+drawClusterPlot(stObj,color=cb_palette1,islegend = T,size = 3)
+```
+
+# 3. Verify
+```{r}
+# Pearson correlation of spots within the same layer
+pearson <- computePearsonIndex(stObj,"RUD")
+
+ggplot(data=pearson,aes(x=label,y=value,fill=source)) +geom_boxplot()+
+  labs(title="Pearson correlations")+
+  theme(panel.grid =element_blank(),plot.title = element_text(hjust = 0.5),
+        panel.background = element_blank(),axis.line = element_line(colour='black'))
+
+# Cluster evaluation of different indexes
+index<-computeIndex(stObj)
+
+```
+
+# 4. Identification DEAPA, LSAPA and SVAPA 
+```{r}
+# DEAPA
+stObj<-findContrastAPA(stObj)
+length(stObj@DEAPA$all)
+# LSAPA
+stObj<-findAllMarkers(stObj,logFC = 0)
+table(stObj@LSAPA$cluster)
+
+# SVAPA(slow, not run in test)
+#stObj<-findSVAPA(stObj)
+#nrow(stObj@SVAPA)
+
+# DEAPA\LSAPA\SVAPA gene set
+gene<-findstAPASet(stObj)
+length(gene)
+# Visualize individual gene expression levels on a spatial scatter plot
+drawSpatialExpress(stObj,"St8sia5",size=5)
+
+# Identification of APA genes with spatial patterns
+patterns <- findSpatialPattern(stObj,gene)
+table(patterns$cluster)
+
+```
+
+# Convert object
+
+```{r}
+# Convert Seurat object to SingleCellExperiment object
+sceObj <- convertToSCE(stObj)
+
+# Convert Sierra results to movAPA object
+
+### NOT RUN in test ----
+## sierra_path: path to Sierra result file.
+## annodb: GTF file annotating poly(A) sites information
+# sierra_movAPA <- readSierra(sierra_path,gtf)
+
+###
+```
