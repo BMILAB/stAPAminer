@@ -4,7 +4,7 @@
 \alias{findSpatialPattern}
 \title{Identification of APA genes with spatial patterns}
 \usage{
-findSpatialPattern(stAPAminerObj, features, k = 10)
+findSpatialPattern(stAPAminerObj, features, k = 10, cor = 0.5, p.value = 0.05)
 }
 \arguments{
 \item{stAPAminerObj}{A stAPAminer object.}
@@ -12,6 +12,10 @@ findSpatialPattern(stAPAminerObj, features, k = 10)
 \item{features}{Genes to be tested with spatial patterns of variation in APA usage}
 
 \item{k}{Number of spatial patterns}
+
+\item{cor}{Threshold for Pearson's correlation coefficient}
+
+\item{p.value}{Threshold for p value}
 }
 \description{
 Identification of APA genes with spatial patterns of APA usage variation
