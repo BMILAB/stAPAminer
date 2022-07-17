@@ -219,7 +219,7 @@ drawSpatialExpress<-function(stAPAminerObj,geneName,title = geneName,size = 2){
 #'
 #' @examples
 findContrastAPA<-function(stAPAminerObj,padj = 0.05,logFC = 0.5,levels=c("GCL","MCL","OPL","GL","ONL")){
-  stAPAminerObj@DEAPA$all <- c()
+  stAPAminerObj@DEAPA$all <- data.frame()
   stAPAminerObj@seurat@active.ident = factor(stAPAminerObj@seurat@active.ident, levels=levels)
   layersPair<-combn(levels(stAPAminerObj@seurat@active.ident),2)
   for(i in 1:ncol(layersPair)){
@@ -235,10 +235,12 @@ findContrastAPA<-function(stAPAminerObj,padj = 0.05,logFC = 0.5,levels=c("GCL","
     }
     stAPAminerObj@DEAPA[[paste0(layer1,'-',layer2)]]<-markers
 
-    stAPAminerObj@DEAPA$all <- c(stAPAminerObj@DEAPA$all,rownames(markers))
-  }
 
-  stAPAminerObj@DEAPA$all <- unique(stAPAminerObj@DEAPA$all)
+    markers$pairs <- paste0(layer1,'-',layer2)
+    markers$gene <- rownames(markers)
+
+    stAPAminerObj@DEAPA$all <- rbind(stAPAminerObj@DEAPA$all,markers)
+  }
 
   return(stAPAminerObj)
 }
@@ -303,8 +305,17 @@ findSVAPA<-function(stAPAminerObj,padj=0.05){
 }
 
 
+#' @title Merging multiple types of differential APA genes
+#' @description Merging multiple types of differential APA genes
+#'
+#' @param stAPAminerObj A stAPAminer object.
+#'
+#' @return
+#' @export
+#'
+#' @examples
 findstAPASet<-function(stAPAminerObj){
-  set<-c(stAPAminerObj@DEAPA$all,stAPAminerObj@LSAPA$gene,rownames(stAPAminerObj@SVAPA))
+  set<-c(stAPAminerObj@DEAPA$all$gene,stAPAminerObj@LSAPA$gene,rownames(stAPAminerObj@SVAPA))
   set<-unique(set)
   return(set)
 }
@@ -367,12 +378,14 @@ drawVolcano<-function(stAPAminerObj,layer1,layer2,padj = 0.05,logFC = 0.5,tittle
 #' @param stAPAminerObj A stAPAminer object.
 #' @param features Genes to be tested with spatial patterns of variation in APA usage
 #' @param k Number of spatial patterns
+#' @param cor Threshold for Pearson's correlation coefficient
+#' @param p.value Threshold for p value
 #'
 #' @return
 #' @export
 #'
 #' @examples
-findSpatialPattern<-function(stAPAminerObj,features,k=10){
+findSpatialPattern<-function(stAPAminerObj,features,k=10,cor=0.5,p.value = 0.05){
   features.filter <- features[features %in% rownames(stAPAminerObj@count)]
   count_feature<-stAPAminerObj@count[features.filter,]
   label<-stAPAminerObj@metaData
@@ -385,6 +398,28 @@ findSpatialPattern<-function(stAPAminerObj,features,k=10){
   pattern<-as.data.frame(t(pattern))
   colnames(pattern)<-paste0("pattern_",c(1:k))
   uuKmeans$patternCount<-pattern
+
+  nbfd <- as.data.frame(t(count_feature))
+  patternGenes <- data.frame()
+  for(i in 1:k){
+    gcor <- apply(nbfd,2,function(x){
+      test <- cor.test(x,pattern[,i])
+      data.frame(cor = test$estimate,p.value = test$p.value)
+    })
+
+    ll <- unlist(lapply(gcor, function(x) if(is.data.frame(x)) list(x) else x), recursive = FALSE)
+    cor.res <- do.call(rbind, ll)
+    cor.filter <- cor.res[cor.res$cor > cor & cor.res$p.value < p.value,]
+    if(nrow(cor.filter) >0){
+      cor.filter[order(cor.filter$cor,decreasing = TRUE),]
+      cor.filter$gene <- rownames(cor.filter)
+      cor.filter$pattern <- paste0("pattern_",i)
+      rownames(cor.filter) <- NULL
+      patternGenes <- rbind(patternGenes,cor.filter)
+    }
+
+  }
+  uuKmeans$patternGenes <- patternGenes
   return(uuKmeans)
 }
 
