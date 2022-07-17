@@ -44,6 +44,10 @@ RUD_RAW<-computeAPAIndex(APA,rownames(position))
 geneSymbol <-  mapIds(org.Mm.eg.db,rownames(RUD_RAW),'SYMBOL','ENTREZID')
 rownames(RUD_RAW)<-geneSymbol
 
+### NOT RUN in test ----
+# Calculate the optimal k value
+optimalK <- optimalKvalue(RUD_RAW,count,position,ncluster=5,orders = c(seq(4,14,2)))
+### ---
 # Imputes
 RUD <-imputeAPAIndex(RUD_RAW,count,k=10,init = TRUE)
 
@@ -84,11 +88,11 @@ index<-computeIndex(stObj)
 ```{r}
 # DEAPA
 stObj<-findContrastAPA(stObj)
-length(stObj@DEAPA$all)
+length(unique(stObj@DEAPA$all$gene))
 # LSAPA
-stObj<-findAllMarkers(stObj,logFC = 0)
+stObj<-findAllMarkers(stObj)
 table(stObj@LSAPA$cluster)
-
+length(unique(stObj@LSAPA$gene))
 # SVAPA(slow, not run in test)
 #stObj<-findSVAPA(stObj)
 #nrow(stObj@SVAPA)
@@ -117,6 +121,6 @@ sceObj <- convertToSCE(stObj)
 ## sierra_path: path to Sierra result file.
 ## annodb: GTF file annotating poly(A) sites information
 # sierra_movAPA <- readSierra(sierra_path,gtf)
+### ---
 
-###
 ```
