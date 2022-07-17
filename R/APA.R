@@ -78,3 +78,83 @@ imputeAPAIndex <- function (index, gene, k = 10, init = TRUE)
   }
   return(index)
 }
+
+#' @title Calculate the optimal k value
+#' @description Calculate the clustering index after imputed under different k values,
+#' and obtain the optimal k value through the comprehensive index
+#' @param data APA index to be recovered
+#' @param count reference gene expression matrix
+#' @param position Location information of spots
+#' @param ncluster The number of clusters in the target cluster
+#' @param orders Which k values to test, we recommend from 4 to 20
+#'
+#' @return
+#' @export
+#'
+#' @examples
+optimalKvalue <- function(data,count,position,ncluster,orders = c(seq(4,20,2))){
+  indexall <- data.frame()
+  for (i in orders){
+
+    tmpR <- imputeAPAIndex(data,count,k=i,init = TRUE) #init==true 填充初始0值
+    res = 1
+    n = 1
+    stObj<- createStAPAminerObject(tmpR,position)
+    stObj<- makeStCluster(stObj,resolution = res,dims = 1:10,k=30)
+
+    while(length(unique(stObj@seurat$seurat_clusters)) != ncluster & n  < 9){
+      n = n + 1
+      if(length(unique(stObj@seurat$seurat_clusters)) > ncluster){
+        res = res - 0.1
+      }
+      if(length(unique(stObj@seurat$seurat_clusters)) < ncluster){
+        res = res + 0.1
+      }
+      stObj<- makeStCluster(stObj,resolution = res,dims = 1:10,k=30)
+    }
+
+    index<- computeIndex(stObj)
+    index<-data.frame(name = names(index),value = as.character(index),source = i)
+    indexall<-rbind(indexall,index)
+  }
+  result <- comIndex(indexall,method = "scale")
+  return(result)
+}
+
+
+comIndex <- function(index,method="rank",sub=NULL){
+  index$value <- as.numeric(index$value)
+  row <- unique(index$name)
+  col <- unique(index$source)
+  indexdf <- matrix(index$value,length(row),length(col),byrow = FALSE)
+  rownames(indexdf) <- row
+  colnames(indexdf) <- col
+  if("DBI" %in% rownames(indexdf)){
+    indexdf["DBI",] <- 1/indexdf["DBI",]
+  }
+  indexdf <- t(indexdf)
+
+  if(!is.null(sub)){
+
+    indexdf <- indexdf[,sub]
+  }
+
+  if(method == "scale"){
+    scale.index <- scale(indexdf, scale = TRUE)
+    scale.index2 <- rowSums(scale.index)
+    res <- sort(scale.index2,decreasing = TRUE)
+
+    resdf <- data.frame(order = seq(length(scale.index2):1),value=res,name=names(res))
+  }
+  if(method =="rank"){
+    indexRank <- apply(indexdf,2,rank)
+    comindex <- rowSums2(indexRank)
+    names(comindex) <- rownames(indexRank)
+    comindex <- sort(comindex,decreasing = TRUE)
+    resdf <- data.frame(order = seq(length(comindex):1),value=comindex,name=names(comindex))
+
+  }
+  resdf$name <- as.numeric(resdf$name)
+
+  return(resdf)
+}
