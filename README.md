@@ -2,7 +2,8 @@
 Mining Spatial Patterns of Alternative Polyadenylation for Spatially Resolved Transcriptomic Studies
 
 ## About
-Alternative polyadenylation (APA) contributes to transcriptome complexity and gene expression regulation, which has been implicated in various cellular processes and diseases. Single-cell RNA-seq (scRNA-seq) has led to the profile of APA at the single-cell level, however, the spatial information of cells is not preserved in scRNA-seq. Alternatively, spatial transcriptomics (ST) technologies provide opportunities to decipher the spatial context of the transcriptomic landscape within single cells and/or across tissue sections. Pioneering studies on ST have unveiled potential spatially variable genes and/or splice isoforms, however, the pattern of APA usages in spatial contexts remains unappreciated. Here, we developed a toolkit called stAPAminer for mining spatial patterns of APA from spatial barcoded ST data. APA sites were identified and quantified from the ST data. Particularly, an imputation model based on k-nearest neighbors algorithm was designed for recovering APA signals. Then APA genes with spatial patterns of APA usage variation were identified. By analyzing the well-established ST data of mouse olfactory bulb (MOB), we present a detailed view of spatial APA usage across morphological layers of MOB with stAPAminer. We complied a comprehensive list of genes with spatial APA dynamics and obtained several major spatial expression patterns representing spatial APA dynamics in different morphological layers. Extending this analysis to two additional replicates of the MOB ST data, we found that spatial APA patterns of many genes are reproducible among replicates.
+Alternative polyadenylation (APA) contributes to transcriptome complexity and gene expression regulation, which has been implicated in various cellular processes and diseases. Single-cell RNA-seq (scRNA-seq) has led to the profile of APA at the single-cell level, however, the spatial information of cells is not preserved in scRNA-seq. Alternatively, spatial transcriptomics (ST) technologies provide opportunities to decipher the spatial context of the transcriptomic landscape within single cells and/or across tissue sections. Pioneering studies on ST have unveiled potential spatially variable genes and/or splice isoforms, however, the pattern of APA usages in spatial contexts remains unappreciated. 
+Here, we developed a toolkit called stAPAminer for mining spatial patterns of APA from spatial barcoded ST data. APA sites were identified and quantified from the ST data. Particularly, an imputation model based on k-nearest neighbors algorithm was designed for recovering APA signals. Then APA genes with spatial patterns of APA usage variation were identified. By analyzing the well-established ST data of mouse olfactory bulb (MOB), we present a detailed view of spatial APA usage across morphological layers of MOB with stAPAminer. We complied a comprehensive list of genes with spatial APA dynamics and obtained several major spatial expression patterns representing spatial APA dynamics in different morphological layers. Extending this analysis to two additional replicates of the MOB ST data, we found that spatial APA patterns of many genes are reproducible among replicates.
 
 * Preparing the input for stAPAminer
 
@@ -44,10 +45,13 @@ library(stAPAminer)
 count<-read.csv(system.file("extdata", "count.csv", package = "stAPAminer"))
 ## individual spots and coordinates
 position<-read.table(system.file("extdata", "position.txt", package = "stAPAminer"))
+
 ## the APA-spot count matrix stored as a movAPA PACdataset
 load(system.file("extdata", "APA.RDA", package = "stAPAminer"))
+
 ## calculating APA ratios
 RUD <- computeAPAIndex(APA,rownames(position))
+
 ## imputation
 RUD <- imputeAPAIndex(RUD_RAW,count,k=10)
 ```
@@ -59,7 +63,8 @@ stObj <- makeStCluster(stObj,resolution = 0.6,dims = 1:10,k=30,nfeatures = 4500)
 findLabels(stObj)
 stObj <- RenameCluster(stObj,c("GCL","GL","ONL","OPL","MCL"))
 drawClusterPlot(stObj,color=distinctColorPalette(5),islegend = T,size = 3)
-##Verify
+
+##Verify by correlation
 pearson_RUD <- computePearsonIndex(stObj,"RUD")
 index <- computeIndex(stObj)
 drawVolcano(stObj,"GCL","GL")
@@ -70,9 +75,11 @@ stObj <- findContrastAPA(stObj)
 stObj <- findAllMarkers(stObj,logFC = 0.5)
 stObj <- findSVAPA(stObj)
 geneSet <- findstAPASet(stObj)
+
 ##draw APA Spatial Express picture
 drawSpatialExpress(stObj,"Pde1c")
 ```
 
 ## Citation
+Ji G, Tang Q, Zhu S, Zhu J, Ye P, Xia S, Wu X: stAPAminer: Mining Spatial Patterns of Alternative Polyadenylation for Spatially Resolved Transcriptomic Studies. bioRxiv 2022:2022.2007.2020.500789.
 
