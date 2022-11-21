@@ -1,6 +1,6 @@
 #Note： The extraction process of poly(A) refers to scAPAtrap : http://www.bmibig.cn/mnt/scAPAtrap/Tutorial/scAPAtrap_compare.html
 ## Call scAPAtrap script
-Usage: ./Def.sh ./scAPAtrapDef.R ./findscAPA.R [sample_name] bam-file
+Usage: ./Def.sh ./scAPAtrapDef.R ./findscAPA.R [sample_name] bam-file \n
 Example: ./Def.sh ./scAPAtrapDef.R ./findscAPA.R st_mob ./st_mob.bam
 As a result, three files will be generated: 1. DefExp/st_mob.counts.tsv.gz 2. DefSAF/Def_st_mob.saf
 3. scPA/ st_mob_scAPApeak.Rda. Used in the next step to generate movAPA objects.
