@@ -1,4 +1,4 @@
-### The extraction process of poly(A) refers to scAPAtrap : http://www.bmibig.cn/mnt/scAPAtrap/Tutorial/scAPAtrap_compare.html
+#Note： The extraction process of poly(A) refers to scAPAtrap : http://www.bmibig.cn/mnt/scAPAtrap/Tutorial/scAPAtrap_compare.html
 ## Call scAPAtrap script
 Usage: ./Def.sh ./scAPAtrapDef.R ./findscAPA.R [sample_name] bam-file
 Example: ./Def.sh ./scAPAtrapDef.R ./findscAPA.R st_mob ./st_mob.bam
@@ -29,3 +29,4 @@ txdbmmu.10 <- parseGenomeAnnotation(txdbmmu.10)
 scPACds<- annotatePAC(scPACds, txdbmmu.10)
 ## Apply 1000bp to the 3utr extension, and classify the PA sites located in it as 3utrPA sites
 scPACds <- ext3UTRPACds(scPACds, ext3UTRlen = 1000)
+
