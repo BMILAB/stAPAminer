@@ -1,3 +1,4 @@
+## Compared with other databases to verify the confidence of poly(A) sites
 library(movAPA)
 library(stAPAminer)
 library(BSgenome.Mmusculus.UCSC.mm10)
