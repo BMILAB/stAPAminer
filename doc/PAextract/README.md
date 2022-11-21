@@ -6,8 +6,9 @@ As a result, three files will be generated:
 1. DefExp/st_mob.counts.tsv.gz   
 2. DefSAF/Def_st_mob.saf    
 3. scPA/ st_mob_scAPApeak.Rda.   
-Used in the next step to generate movAPA objects.
-## Generate PACds object
+
+## Generate PACds object  
+```
 library(scAPAtrap)
 library(movAPA)
 library(TxDb.Mmusculus.UCSC.mm10.knownGene)
@@ -32,4 +33,4 @@ txdbmmu.10 <- parseGenomeAnnotation(txdbmmu.10)
 scPACds<- annotatePAC(scPACds, txdbmmu.10)
 ## Apply 1000bp to the 3utr extension, and classify the PA sites located in it as 3utrPA sites
 scPACds <- ext3UTRPACds(scPACds, ext3UTRlen = 1000)
-
+```
