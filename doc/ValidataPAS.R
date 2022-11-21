@@ -8,21 +8,15 @@ library(BSgenome.Mmusculus.UCSC.mm10)
 ## download the data from http://www.bmibig.cn/mnt/stAPAminer/
 
 ## reference PolyAsite 2.0
-
 mm10polyAsite2 <- readRDS("mm10polyAsite2.rds")
 
-## reference scMOB
-
-## scAPAtrap
-
+## poly(A) sites from scRNA-seq of MOB data (SC-MOB)
 SCMOB <- readRDS("SCMOB.rds")
-## Sierra
-SCMOB_Sierra <- readRDS("SCMOB_Sierra.rds")
 
-## ST-MOB Rep11
+## poly(A) sites from ST-MOB Replicate 11
 STMOB <- readRDS("STMOB.rds")
 
-#### Plot single nucleotide frequency ----
+#### Plot single nucleotide frequency (Figure 2B) ----
 bsgenome <- BSgenome.Mmusculus.UCSC.mm10
 
 faFromPACds(mm10polyAsite2, bsgenome, what='updn', fapre='mm10polyAsite2', up=-100, dn=100)
@@ -48,8 +42,9 @@ comATCGplot <- mm10polyAsite2_plot+ SCMOB_plot+ SCMOB.Sierra_plot + STMOB_plot
 library(eoffice)
 topptx(comATCGplot,filename = "comATCGplot.pptx", width = 10,height = 6)
 
-#### validate poly(A) sites ----
+#### validate poly(A) sites (Figure 2C) ----
 
+# adjusting the coordinate (0-based in mm10polyAsite2; 1-based in STMOB)
 STMOB_adj <- STMOB
 STMOB_adj@anno[STMOB_adj@anno$strand == "+",]$coord <- STMOB_adj@anno[STMOB_adj@anno$strand == "+",]$coord - 1
 STMOB_adj@anno[STMOB_adj@anno$strand == "-",]$coord <- STMOB_adj@anno[STMOB_adj@anno$strand == "-",]$coord + 1
@@ -65,7 +60,6 @@ sum((Compare1@anno$Mm_ovp + Compare2@anno$Mm_ovp) == 0 )
 
 PolyASite.dist <- as.data.frame(table(na.omit(Compare1@anno$Mm_dist)))
 scMOB.dist <- as.data.frame(table(na.omit(Compare2@anno$Mm_dist)))
-
 
 PolyASite.dist$Freq <- PolyASite.dist$Freq/sum(PolyASite.dist$Freq)
 scMOB.dist$Freq <- scMOB.dist$Freq/sum(scMOB.dist$Freq)
