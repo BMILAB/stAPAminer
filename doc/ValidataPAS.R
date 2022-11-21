@@ -1,4 +1,5 @@
-## Compared with other databases to verify the confidence of poly(A) sites
+## This script shows the code for the validation of poly(A) sites and identification of poly(A) signals, corresponding to Figures 2B and 2C in the manuscript.
+
 library(movAPA)
 library(stAPAminer)
 library(BSgenome.Mmusculus.UCSC.mm10)
