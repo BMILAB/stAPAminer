@@ -6,10 +6,6 @@ Alternative polyadenylation (APA) contributes to transcriptome complexity and ge
 
 Here, we developed a toolkit called stAPAminer for mining spatial patterns of APA from spatial barcoded ST data. APA sites were identified and quantified from the ST data. Particularly, an imputation model based on k-nearest neighbors algorithm was designed for recovering APA signals. Then APA genes with spatial patterns of APA usage variation were identified. By analyzing the well-established ST data of mouse olfactory bulb (MOB), we present a detailed view of spatial APA usage across morphological layers of MOB with stAPAminer. We complied a comprehensive list of genes with spatial APA dynamics and obtained several major spatial expression patterns representing spatial APA dynamics in different morphological layers. Extending this analysis to two additional replicates of the MOB ST data, we found that spatial APA patterns of many genes are reproducible among replicates.
 
-* Preparing the input for stAPAminer
-
-The input of stAPAminer is a poly(A) site matrix with each row being a poly(A) site and each column being a spot. APA sites can only be identified from the spatial barcoded ST data for now, using existing scRNA-seq tools like scAPAtrap or Sierra. Please refer to this [document](https://github.com/BMILAB/stAPAminer/blob/main/doc/PAextract/README.md) for detailed pipeline of identifying APA sites from spatial barcoded ST data.
-
 * The stAPAminer package consists of three main modules.
 <img src="pic/process.jpg" width="100%" />
 
@@ -20,6 +16,10 @@ B. Verifying the correctness of the imputation method
 C. Identifying genes with differential APA usage between morphological layers and genes with spatial patterns of APA usage variation
 
 ## Getting started
+
+### Preparing the input for stAPAminer
+The input of stAPAminer is a poly(A) site matrix with each row being a poly(A) site and each column being a spot. APA sites can only be identified from the spatial barcoded ST data for now, using existing scRNA-seq tools like scAPAtrap or Sierra. Please refer to this [document](https://github.com/BMILAB/stAPAminer/blob/main/doc/PAextract/README.md) for detailed pipeline of identifying APA sites from spatial barcoded ST data.
+
 ### Mandatory
 * R (>=3.6.0). [R 3.6.3](https://www.r-project.org/) is recommended.
 
