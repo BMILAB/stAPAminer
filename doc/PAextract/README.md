@@ -13,7 +13,7 @@ The pipeline of scAPAtrap generates three files:
 2. DefSAF/Def_st_mob.saf    
 3. scPA/ st_mob_scAPApeak.Rda.   
 
-Please refer to the [scAPAtrap pipeline]((http://www.bmibig.cn/mnt/scAPAtrap/Tutorial/scAPAtrap.html)) for identifying poly(A) sites from BAM files. 
+Please refer to the [scAPAtrap pipeline](http://www.bmibig.cn/mnt/scAPAtrap/Tutorial/scAPAtrap.html) for identifying poly(A) sites from BAM files. 
 
 ## Using movAPA for annotating poly(A) sites
 
