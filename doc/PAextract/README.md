@@ -5,6 +5,7 @@ The process of extracting APA sites from ST data is similar to that of scRNA-seq
 ## Using scAPAtrap for identifying poly(A) sites from ST data
 
 Usage: `./Def.sh ./scAPAtrapDef.R ./findscAPA.R [sample_name] bam-file`
+
 Example: `./Def.sh ./scAPAtrapDef.R ./findscAPA.R st_mob ./st_mob.bam`
 
 The pipeline of scAPAtrap generates three files:   
@@ -49,3 +50,8 @@ scPACds<- annotatePAC(scPACds, txdbmmu.10)
 ## Apply 1000bp to the 3utr extension, and classify the PA sites located in it as 3utrPA sites
 scPACds <- ext3UTRPACds(scPACds, ext3UTRlen = 1000)
 ```
+
+## Validation of poly(A) sites and identification of poly(A) signals
+
+Please refer to [/doc/ValidataPAS.R](https://github.com/BMILAB/stAPAminer/blob/main/doc/ValidataPAS.R) for details. This script shows the code for plotting some figures in the manuscript.
+
